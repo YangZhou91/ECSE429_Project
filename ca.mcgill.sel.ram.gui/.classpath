@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="src" path="tests"/>
 	<classpathentry kind="lib" path="lib/jogl/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogl/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/mt4j.jar" sourcepath="lib/mt4j.src.zip">

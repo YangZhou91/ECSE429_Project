@@ -7,7 +7,8 @@ Require-Bundle: ca.mcgill.sel.ram.edit;bundle-version="2.0.0",
  ca.mcgill.sel.ram.controller;bundle-version="1.0.0",
  ca.mcgill.sel.ram.classloader;bundle-version="1.0.0",
  ca.mcgill.sel.ram.generator;bundle-version="1.0.0",
- ca.mcgill.sel.ram.validator;bundle-version="1.0.0"
+ ca.mcgill.sel.ram.validator;bundle-version="1.0.0",
+ org.junit
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: SEL Team, McGill University
