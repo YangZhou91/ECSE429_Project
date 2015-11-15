@@ -1,7 +1,7 @@
 /**
- * 
+ * Test case for MessageHandler
  */
-package group02;
+package ca.mcgill.sel.ram.ui.views.message.handler.impl;
 
 import static org.junit.Assert.fail;
 

@@ -5,6 +5,7 @@ Bundle-SymbolicName: ca.mcgill.sel.ram.controller;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Require-Bundle: ca.mcgill.sel.ram.edit;bundle-version="1.8.0"
+Require-Bundle: ca.mcgill.sel.ram.edit;bundle-version="1.8.0",
+ org.junit
 Export-Package: ca.mcgill.sel.core.controller,
  ca.mcgill.sel.ram.controller
