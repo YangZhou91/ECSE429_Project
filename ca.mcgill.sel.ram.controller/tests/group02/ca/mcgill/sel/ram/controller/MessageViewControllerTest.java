@@ -1,9 +1,9 @@
 /**
- * 
+ * Test case for MessageViewController
  */
-package group02;
+package ca.mcgill.sel.ram.controller;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -12,11 +12,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * @author Yang Zhou
- *         ID: 260401719
+ * @author Wayne 260532614
  *
  */
-public class MessageHandlerTest {
+public class MessageViewControllerTest {
 
     /**
      * @throws java.lang.Exception
@@ -46,23 +45,8 @@ public class MessageHandlerTest {
     public void tearDown() throws Exception {
     }
 
-    /**
-     * Test method for
-     * {@link ca.mcgill.sel.ram.ui.views.message.handler.impl.MessageHandler#processTapAndHoldEvent(org.mt4j.input.inputProcessors.componentProcessors.tapAndHoldProcessor.TapAndHoldEvent)}
-     * .
-     */
     @Test
-    public void testProcessTapAndHoldEvent() {
-        fail("Not yet implemented");
-    }
-
-    /**
-     * Test method for
-     * {@link ca.mcgill.sel.ram.ui.views.handler.BaseHandler#processGestureEvent(org.mt4j.input.inputProcessors.MTGestureEvent)}
-     * .
-     */
-    @Test
-    public void testProcessGestureEvent() {
+    public void test() {
         fail("Not yet implemented");
     }
 
