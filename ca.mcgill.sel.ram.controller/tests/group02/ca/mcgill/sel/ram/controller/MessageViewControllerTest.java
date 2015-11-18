@@ -2,6 +2,8 @@ package ca.mcgill.sel.ram.controller;
 
 import static org.junit.Assert.*;
 
+import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.ecore.EObject;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -9,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ca.mcgill.sel.commons.emf.util.AdapterFactoryRegistry;
+import ca.mcgill.sel.commons.emf.util.EMFEditUtil;
 import ca.mcgill.sel.commons.emf.util.EMFModelUtil;
 import ca.mcgill.sel.commons.emf.util.ResourceManager;
 import ca.mcgill.sel.ram.Aspect;
@@ -17,13 +20,16 @@ import ca.mcgill.sel.ram.CombinedFragment;
 import ca.mcgill.sel.ram.FragmentContainer;
 import ca.mcgill.sel.ram.Interaction;
 import ca.mcgill.sel.ram.InteractionFragment;
+import ca.mcgill.sel.ram.LayoutElement;
 import ca.mcgill.sel.ram.Lifeline;
+import ca.mcgill.sel.ram.MessageOccurrenceSpecification;
 import ca.mcgill.sel.ram.MessageView;
 import ca.mcgill.sel.ram.Operation;
 import ca.mcgill.sel.ram.RamFactory;
 import ca.mcgill.sel.ram.RamPackage;
 import ca.mcgill.sel.ram.Reference;
 import ca.mcgill.sel.ram.TypedElement;
+import ca.mcgill.sel.ram.impl.ContainerMapImpl;
 import ca.mcgill.sel.ram.provider.RamItemProviderAdapterFactory;
 import ca.mcgill.sel.ram.util.RAMModelUtil;
 import ca.mcgill.sel.ram.util.RamResourceFactoryImpl;
@@ -95,11 +101,11 @@ public class MessageViewControllerTest {
 //    }
 
     /**
+     * One test case can cover all paths (there is only 1) <br>
      * Test method for {@link MessageViewController#createLifeline(Interaction, TypedElement, float, float)}.
      */
-    @Test
+//    @Test
     public void testCreateLifeline() {
-        // One test case can cover all du-paths
         // 68-69-70-72
         Classifier classA = aspect.getStructuralView().getClasses().get(0);
         Operation doSomething = classA.getOperations().get(0);
@@ -109,9 +115,17 @@ public class MessageViewControllerTest {
         
         TypedElement classB = classA.getAssociationEnds().get(0);
         int lifelineCount = owner.getLifelines().size();
-
+        
         controller.createLifeline(owner, classB, 0, 0);
+        
+        // lifeline count is size - 1
+        Lifeline newLifeline = owner.getLifelines().get(lifelineCount);
+        EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
+        LayoutElement lifelineLayout = myMap.get(newLifeline);
+
         assertEquals(lifelineCount + 1, owner.getLifelines().size());
+        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
+        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
     }
 
     /**
@@ -134,7 +148,7 @@ public class MessageViewControllerTest {
      * Test method for {@link MessageViewController#createLifelineWithMessage
      * (Interaction, TypedElement, float, float, Lifeline, FragmentContainer, Operation, int)}.
      */
-    @Test
+//    @Test
     public void testCreateLifelineWithMessage01() {
         // container.getFragments.size > 0
         // initialMessage != null
@@ -166,15 +180,22 @@ public class MessageViewControllerTest {
         controller.createLifelineWithMessage(owner, classCType, 0, 0, lifelineFrom, 
                 container, getRandom, previousFragIndex);
         
+        // Get newly added lifeline
+        Lifeline newLifeline = owner.getLifelines().get(previousLifelineCount);
+        EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
+        LayoutElement lifelineLayout = myMap.get(newLifeline);
+        
         assertEquals(owner.getLifelines().size(), previousLifelineCount + 1);
         assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
+        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
     }
     
     /**
      * Test path 2: 93-101-104-107-112-113-116-121-123-133-137-148-159-160-163-166.
      * @see #testCreateLifelineWithMessage01
      */
-    @Test
+//    @Test
     public void testCreateLifelineWithMessage02() {
         // container.getFragments.size == 0
         // initialMessage == null
@@ -210,14 +231,21 @@ public class MessageViewControllerTest {
         controller.createLifelineWithMessage(owner, classCType, 0, 0, lifelineFrom, 
                 container, create, addAtIndex);
         
+        // Get newly added lifeline
+        Lifeline newLifeline = owner.getLifelines().get(previousLifelineCount);
+        EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
+        LayoutElement lifelineLayout = myMap.get(newLifeline);
+        
         assertEquals(owner.getLifelines().size(), previousLifelineCount + 1);
         assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
+        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
     }
     
     /**
      * Test path 3: 93-101-102-107-112-116-121-144-159-170.
      */
-    @Test
+//    @Test
     public void testCreateLifelineWithMessage03() {
         // container.getFragments.size > 0
         // initialMessage != null
@@ -241,46 +269,185 @@ public class MessageViewControllerTest {
         
         controller.createLifelineWithMessage(owner, classBType, 0, 0, lifelineFrom, owner, signature, addAtIndex);
         
+        // Get newly added lifeline
+        Lifeline newLifeline = owner.getLifelines().get(previousLifelineCount);
+        EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
+        LayoutElement lifelineLayout = myMap.get(newLifeline);
+        
         assertEquals(owner.getLifelines().size(), previousLifelineCount + 1);
         assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
+        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
     }
 
     /**
+     * Single test case is enough to cover all paths (only 1 path) <br>
      * Test method for {@link MessageViewController#moveLifeline(Lifeline, float, float)}.
      */
     @Test
     public void testMoveLifeline() {
-//        MessageView messageView = (MessageView) aspect.getMessageViews().get(0);
-//        Lifeline lifeline = messageView.getSpecification().getLifelines().get(0);
-//        
-        fail("Not yet implemented");
+        MessageView messageView = (MessageView) aspect.getMessageViews().get(0);
+        Lifeline lifeline = messageView.getSpecification().getLifelines().get(0);
+        EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
+
+        LayoutElement lifelineLayout = myMap.get(lifeline);
+        float x = lifelineLayout.getX();
+        float y = lifelineLayout.getY();
+        controller.moveLifeline(lifeline, x * x, x * x);
+        
+        assertEquals(lifelineLayout.getX(), x * x, Float.MIN_VALUE);
+        assertEquals(lifelineLayout.getY(), y * y, Float.MIN_VALUE);
     }
 
     /**
+     * Need to include following transitions for all-p-uses <br>
+     * 240-253-262 (var container, owner) <br>
+     * 240-253-254 (var container, owner) <br>
+     * 240-253-254-257-258 (var lifelineTo) <br>
+     * 240-253-254-257-260 (var lifelineTo) <br>
+     * <br>
+     * 3 test cases for create message <br>
+     * 1) 240-253-262<br>
+     * 2) 240-253-254-257-258<br>
+     * 3) 240-253-254-257-260<br>
+     * <br>
+     * Test path 1: 240-253-262<br>
+     * <br>
      * Test method for {@link MessageViewController#createMessage
      * (Interaction, Lifeline, Lifeline, FragmentContainer, Operation, int)}.
      */
     @Test
-    public void testCreateMessage() {
-        fail("Not yet implemented");
+    public void testCreateMessage01() {
+        // owner == container
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething3 = classA.getOperations().get(2);
+        Operation doSomething = classA.getOperations().get(0);
+        
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething3);
+        Interaction owner = messageView.getSpecification();
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+        Lifeline lifelineTo = lifelineFrom;
+        
+        // Add before last message
+        int addAtIndex = owner.getFragments().size() - 2;
+        
+        int previousMessageCount = owner.getMessages().size();
+        
+        controller.createMessage(owner, lifelineFrom, lifelineTo, owner, doSomething, addAtIndex);
+        
+        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+    }
+    
+    /**
+     * Test path 2: 240-253-254-257-258.
+     * @see #testCreateLifelineWithMessage01()
+     */
+    @Test
+    public void testCreateMessage02() {
+        // owner != container
+        // lifelineTo not covered by combined fragments
+        
+        // owner == container
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething3 = classA.getOperations().get(2);
+        
+        Classifier classC = aspect.getStructuralView().getClasses().get(2);
+        Operation getRandom = classC.getOperations().get(1);
+        
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething3);
+        Interaction owner = messageView.getSpecification();
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+        Lifeline lifelineTo = owner.getLifelines().get(1);
+
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(3);
+        FragmentContainer container = cf.getOperands().get(0);
+        int addAtIndex = 0;
+        
+        int previousMessageCount = owner.getMessages().size();
+        
+        controller.createMessage(owner, lifelineFrom, lifelineTo, container, getRandom, addAtIndex);
+        
+        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+    }
+    
+    /**
+     * Test path 3: 240-253-254-257-260.
+     * @see #testCreateMessage01
+     */
+    @Test
+    public void testCreateMessage03() {
+        // owner != container
+        // lifelineTo covered by combined fragments
+        // owner == container
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething3 = classA.getOperations().get(2);   
+        Operation doSomething = classA.getOperations().get(0);
+        
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething3);
+        Interaction owner = messageView.getSpecification();
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+        Lifeline lifelineTo = lifelineFrom;
+
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(3);
+        FragmentContainer container = cf.getOperands().get(0);
+        int addAtIndex = 0;
+
+        int previousMessageCount = owner.getMessages().size();
+        
+        controller.createMessage(owner, lifelineFrom, lifelineTo, container, doSomething, addAtIndex);
+        
+        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
     }
 
     /**
+     * One path is enough to cover all case
+     * <br>
      * Test method for {@link MessageViewController#createReplyMessage
      * (Interaction, Lifeline, Lifeline, FragmentContainer, Operation, int)}.
      */
     @Test
     public void testCreateReplyMessage() {
-        fail("Not yet implemented");
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething4 = classA.getOperations().get(3);   
+        
+        Classifier classC = aspect.getStructuralView().getClasses().get(2);
+        Operation doInternalCalc = classC.getOperations().get(2);
+        
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething4);
+        Interaction owner = messageView.getSpecification();
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+        Lifeline lifelineTo = owner.getLifelines().get(1);
+        
+        int addAtIndex = 1;
+        
+        int previousMessageCount = owner.getMessages().size();
+        
+        controller.createReplyMessage(owner, lifelineFrom, lifelineTo, owner, doInternalCalc, addAtIndex);
+        
+        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
     }
 
     /**
+     * One path to cover all (not sure if assigning a boolean is c-use or p-use)
+     * <br>
      * Test method for {@link MessageViewController#removeMessages
      * (Interaction, FragmentContainer, MessageOccurrenceSpecification)}.
      */
     @Test
     public void testRemoveMessages() {
-        fail("Not yet implemented");
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething5 = classA.getOperations().get(4);   
+                
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething5);
+        Interaction owner = messageView.getSpecification();
+        MessageOccurrenceSpecification sendEvent = (MessageOccurrenceSpecification) owner.getFragments().get(1);
+
+        int previousMessageCount = owner.getMessages().size();
+        
+        // Delete sendEvent (which should delete 3 messages in total)
+        controller.removeMessages(owner, owner, sendEvent);
+        
+        assertEquals(owner.getMessages().size(), previousMessageCount - 3);
     }
 
     /**
