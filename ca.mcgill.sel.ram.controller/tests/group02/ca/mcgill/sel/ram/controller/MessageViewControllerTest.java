@@ -407,22 +407,22 @@ public class MessageViewControllerTest {
      */
     @Test
     public void testCreateReplyMessage() {
-        Classifier classA = aspect.getStructuralView().getClasses().get(0);
-        Operation doSomething4 = classA.getOperations().get(3);   
-        
         Classifier classC = aspect.getStructuralView().getClasses().get(2);
-        Operation doInternalCalc = classC.getOperations().get(2);
+        Operation replyInt = classC.getOperations().get(3);
         
-        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething4);
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, replyInt);
         Interaction owner = messageView.getSpecification();
         Lifeline lifelineFrom = owner.getLifelines().get(0);
-        Lifeline lifelineTo = owner.getLifelines().get(1);
+        Lifeline lifelineTo = null;
         
-        int addAtIndex = 1;
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(1);
+        FragmentContainer container = cf.getOperands().get(0);
+        
+        int addAtIndex = 0;
         
         int previousMessageCount = owner.getMessages().size();
         
-        controller.createReplyMessage(owner, lifelineFrom, lifelineTo, owner, doInternalCalc, addAtIndex);
+        controller.createReplyMessage(owner, lifelineFrom, lifelineTo, container, replyInt, addAtIndex);
         
         assertEquals(owner.getMessages().size(), previousMessageCount + 1);
     }
@@ -460,6 +460,8 @@ public class MessageViewControllerTest {
     }
 
     /**
+     * One should be enough if we use the loop in the path
+     * <br>
      * Test method for {@link MessageViewController#getDeletedLifelines(CompoundCommand)}.
      */
     @Test
