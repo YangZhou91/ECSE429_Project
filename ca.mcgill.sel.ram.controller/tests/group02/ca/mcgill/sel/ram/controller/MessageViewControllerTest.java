@@ -2,8 +2,16 @@ package ca.mcgill.sel.ram.controller;
 
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,6 +30,7 @@ import ca.mcgill.sel.ram.Interaction;
 import ca.mcgill.sel.ram.InteractionFragment;
 import ca.mcgill.sel.ram.LayoutElement;
 import ca.mcgill.sel.ram.Lifeline;
+import ca.mcgill.sel.ram.Message;
 import ca.mcgill.sel.ram.MessageOccurrenceSpecification;
 import ca.mcgill.sel.ram.MessageView;
 import ca.mcgill.sel.ram.Operation;
@@ -31,6 +40,7 @@ import ca.mcgill.sel.ram.Reference;
 import ca.mcgill.sel.ram.TypedElement;
 import ca.mcgill.sel.ram.impl.ContainerMapImpl;
 import ca.mcgill.sel.ram.provider.RamItemProviderAdapterFactory;
+import ca.mcgill.sel.ram.provider.util.RAMEditUtil;
 import ca.mcgill.sel.ram.util.RAMModelUtil;
 import ca.mcgill.sel.ram.util.RamResourceFactoryImpl;
 
@@ -104,7 +114,7 @@ public class MessageViewControllerTest {
      * One test case can cover all paths (there is only 1) <br>
      * Test method for {@link MessageViewController#createLifeline(Interaction, TypedElement, float, float)}.
      */
-//    @Test
+    @Test
     public void testCreateLifeline() {
         // 68-69-70-72
         Classifier classA = aspect.getStructuralView().getClasses().get(0);
@@ -132,35 +142,38 @@ public class MessageViewControllerTest {
      * Need to include the following transition for the paths for all-uses (or all-p-uses-some-c?) <br>
      * 93-101-102, 93-101-104 (var = container) <br>
      * 102-107, 104-107 (var = previousFragment) <br>
-     * 107-112-113, 107-112-116 (var = initialMessage) <br>
+     * <strike>107-112-113, 107-112-116 (var = initialMessage)</strike> 
+     * TA said initialMessage == null is not possible anymore <br>
      * 93-*-121-123, 93-*-121-144 (var = represents) <br>
      * 123-*-133-134, 123-*-133-137 (var = staticOperation) <br>
      * 93-*-159-160, 93-*-159-170 (var = owner, container) <br>
      * 148-*-159-163-164, 148-*-159-163-166 (var = newlifeline) <br>
      * <br>
      * Need 3 test cases <br>
-     * 1) 93-101-102-107-112-116-121-123-133-134-148-159-160-163-164 <br>
-     * 2) 93-101-104-107-112-113-116-121-123-133-137-148-159-160-163-166 <br>
-     * 3) 93-101-102-107-112-116-121-144-159-170 <br>
+     * 1) 93-101-102-<strike>107-112-116</strike>
+     *  -121-123-133-134-148-159-160-163-164 <br>
+     * 2) 93-101-104-<strike>107-112-113-116</strike>
+     *  -121-123-133-137-148-159-160-163-166 <br>
+     * 3) 93-101-102-<strike>107-112-116</strike>
+     *  -121-144-159-170 <br>
      * <br>
-     *  Test path 1: 93-101-102-107-112-116-121-123-133-134-148-159-160-163-164 <br>
+     *  Test path 1: 93-101-102-121-123-133-134-148-159-160-163-164 <br>
      * <br>
      * Test method for {@link MessageViewController#createLifelineWithMessage
      * (Interaction, TypedElement, float, float, Lifeline, FragmentContainer, Operation, int)}.
      */
-//    @Test
+    @Test
     public void testCreateLifelineWithMessage01() {
         // container.getFragments.size > 0
-        // initialMessage != null
         // represents is Reference and represents.container is null (is metaclass)
         // staticOperation == true
         // owner != container 
         // newlifeline not covered by combined fragments
         
         Classifier classA = aspect.getStructuralView().getClasses().get(0);
-        Operation doSomething2 = classA.getOperations().get(1);
+        Operation doSomething6 = classA.getOperations().get(5);
         
-        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething2);
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething6);
         Interaction owner = messageView.getSpecification();
         
         Classifier classC = aspect.getStructuralView().getClasses().get(2);
@@ -192,22 +205,21 @@ public class MessageViewControllerTest {
     }
     
     /**
-     * Test path 2: 93-101-104-107-112-113-116-121-123-133-137-148-159-160-163-166.
+     * Test path 2: 93-101-104-121-123-133-137-148-159-160-163-166.
      * @see #testCreateLifelineWithMessage01
      */
-//    @Test
+    @Test
     public void testCreateLifelineWithMessage02() {
         // container.getFragments.size == 0
-        // initialMessage == null
         // represents is Reference and represents.container is null (is metaclass)
         // staticOperation == false
         // owner != container 
         // newlifeline covered by combined fragments
         
         Classifier classA = aspect.getStructuralView().getClasses().get(0);
-        Operation doSomething2 = classA.getOperations().get(1);
+        Operation doSomething6 = classA.getOperations().get(5);
         
-        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething2);
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething6);
         Interaction owner = messageView.getSpecification();
         
         Classifier classC = aspect.getStructuralView().getClasses().get(2);
@@ -217,10 +229,9 @@ public class MessageViewControllerTest {
         
         Lifeline lifelineFrom = owner.getLifelines().get(0);
         
-        // TODO Find a fragment combination such that initial message is null
         // TODO Find a way to make newlifeline covered by combined fragments
         
-        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(5);
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(2);
         FragmentContainer container = cf.getOperands().get(0);
         
         int addAtIndex = 0;
@@ -243,12 +254,11 @@ public class MessageViewControllerTest {
     }
     
     /**
-     * Test path 3: 93-101-102-107-112-116-121-144-159-170.
+     * Test path 3: 93-101-102-121-144-159-170.
      */
-//    @Test
+    @Test
     public void testCreateLifelineWithMessage03() {
         // container.getFragments.size > 0
-        // initialMessage != null
         // represents is Reference and represents.container is not null (not metaclass)
         // owner == container 
         
@@ -451,12 +461,32 @@ public class MessageViewControllerTest {
     }
 
     /**
+     * Need 2 paths alternating removedFromCovered<br>
+     * Use removedFromCovered = true <br>
      * Test method for {@link MessageViewController#appendRemoveEmptyLifelinesCommand
      * (EditingDomain, CompoundCommand, Interaction, List, boolean)}.
      */
     @Test
-    public void testAppendRemoveEmptyLifelinesCommand() {
-        fail("Not yet implemented");
+    public void testAppendRemoveEmptyLifelinesCommand01() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething = classA.getOperations().get(0);   
+                
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething2);
+        Interaction owner = messageView.getSpecification();
+        EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
+        
+        MessageViewController.appendRemoveEmptyLifelinesCommand(domain, compoundCommand, 
+                owner, combinedFragments, true);
+        
+    }
+    
+    /**
+     * Use removedFromCovered = false. <br>
+     * @see #testAppendRemoveEmptyLifelinesCommand01()
+     */
+    @Test
+    public void testAppendRemoveEmptyLifelinesCommand02() {
+        
     }
 
     /**
@@ -466,7 +496,31 @@ public class MessageViewControllerTest {
      */
     @Test
     public void testGetDeletedLifelines() {
-        fail("Not yet implemented");
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething2 = classA.getOperations().get(3);   
+                
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething2);
+        Interaction owner = messageView.getSpecification();
+        EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
+        
+        List<Lifeline> lifelines = owner.getLifelines();
+        List<Message> messages = owner.getMessages();
+        
+        CompoundCommand compoundCommand = new CompoundCommand();
+        CompoundCommand nestedCC = new CompoundCommand();
+        
+        nestedCC.append(AddCommand.create(domain, owner, 
+                RamPackage.Literals.INTERACTION__LIFELINES, RamFactory.eINSTANCE.createLifeline()));
+        
+        compoundCommand.append(RemoveCommand.create(domain, owner, 
+                RamPackage.Literals.INTERACTION__LIFELINES, lifelines));
+        compoundCommand.append(RemoveCommand.create(domain, owner, 
+                RamPackage.Literals.INTERACTION__MESSAGES, messages));
+        compoundCommand.append(nestedCC);
+        
+        int numLifelines = lifelines.size();
+        
+        assertEquals(numLifelines, MessageViewController.getDeletedLifelines(compoundCommand).size());
     }
 
     /**

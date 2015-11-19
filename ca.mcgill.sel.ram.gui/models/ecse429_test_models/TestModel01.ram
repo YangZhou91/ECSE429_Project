@@ -8,6 +8,7 @@
       <operations xmi:id="_FRCacI2DEeWZyYY2ASuJpg" name="doSomething3" visibility="public" returnType="__vrH8ovzEeWiz_K4Hp_mDw"/>
       <operations xmi:id="_rR6VQI2eEeWXg7_ZtwaRkA" name="doSomething4" visibility="public" returnType="__vrH8ovzEeWiz_K4Hp_mDw"/>
       <operations xmi:id="_QSEYwI2gEeWXg7_ZtwaRkA" name="doSomething5" visibility="public" returnType="__vrH8ovzEeWiz_K4Hp_mDw"/>
+      <operations xmi:id="_eexlMI73EeWCBqBwG8tVOA" name="doSomething6" visibility="public" returnType="__vrH8ovzEeWiz_K4Hp_mDw"/>
       <associationEnds xmi:id="_3_KHEIv1EeWiz_K4Hp_mDw" name="myClassB" lowerBound="1" assoc="_3_KuIYv1EeWiz_K4Hp_mDw"/>
     </classes>
     <classes xsi:type="ram:Class" xmi:id="_2Ect4Iv1EeWiz_K4Hp_mDw" name="ClassB" visibility="public">
@@ -250,6 +251,31 @@
       <formalGates xmi:id="_6FXWiI4iEeWvxYxQu-HyyQ" message="_6FXWhY4iEeWvxYxQu-HyyQ" name="out_replyInt"/>
     </specification>
   </messageViews>
+  <messageViews xsi:type="ram:MessageView" xmi:id="_ipDNQI73EeWCBqBwG8tVOA" specifies="_eexlMI73EeWCBqBwG8tVOA">
+    <specification xmi:id="_ipDNQY73EeWCBqBwG8tVOA">
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_ipDNQo73EeWCBqBwG8tVOA" covered="_ipDNRI73EeWCBqBwG8tVOA" message="_ipDNRY73EeWCBqBwG8tVOA"/>
+      <fragments xsi:type="ram:CombinedFragment" xmi:id="_jotTcI73EeWCBqBwG8tVOA" covered="_ipDNRI73EeWCBqBwG8tVOA" interactionOperator="opt">
+        <operands xmi:id="_jotTcY73EeWCBqBwG8tVOA">
+          <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_kVdrwI73EeWCBqBwG8tVOA" covered="_ipDNRI73EeWCBqBwG8tVOA" message="_kVeS0I73EeWCBqBwG8tVOA"/>
+          <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_kVdrwY73EeWCBqBwG8tVOA" covered="_ipDNRI73EeWCBqBwG8tVOA" message="_kVeS0I73EeWCBqBwG8tVOA"/>
+          <interactionConstraint xsi:type="ram:OpaqueExpression" xmi:id="_jotTco73EeWCBqBwG8tVOA" language="java"/>
+        </operands>
+      </fragments>
+      <fragments xsi:type="ram:CombinedFragment" xmi:id="_k_oDEI73EeWCBqBwG8tVOA" covered="_ipDNRI73EeWCBqBwG8tVOA" interactionOperator="critical">
+        <operands xmi:id="_k_oDEY73EeWCBqBwG8tVOA">
+          <interactionConstraint xsi:type="ram:OpaqueExpression" xmi:id="_k_oDEo73EeWCBqBwG8tVOA" language="java"/>
+        </operands>
+      </fragments>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_ipDNQ473EeWCBqBwG8tVOA" covered="_ipDNRI73EeWCBqBwG8tVOA" message="_ipDNRo73EeWCBqBwG8tVOA"/>
+      <lifelines xmi:id="_ipDNRI73EeWCBqBwG8tVOA" represents="_ipDNR473EeWCBqBwG8tVOA" coveredBy="_ipDNQo73EeWCBqBwG8tVOA _ipDNQ473EeWCBqBwG8tVOA _jotTcI73EeWCBqBwG8tVOA _kVdrwI73EeWCBqBwG8tVOA _kVdrwY73EeWCBqBwG8tVOA _k_oDEI73EeWCBqBwG8tVOA"/>
+      <messages xmi:id="_ipDNRY73EeWCBqBwG8tVOA" sendEvent="_ipDNSI73EeWCBqBwG8tVOA" receiveEvent="_ipDNQo73EeWCBqBwG8tVOA" signature="_eexlMI73EeWCBqBwG8tVOA"/>
+      <messages xmi:id="_ipDNRo73EeWCBqBwG8tVOA" sendEvent="_ipDNQ473EeWCBqBwG8tVOA" receiveEvent="_ipDNSY73EeWCBqBwG8tVOA" signature="_eexlMI73EeWCBqBwG8tVOA" messageSort="reply"/>
+      <messages xmi:id="_kVeS0I73EeWCBqBwG8tVOA" sendEvent="_kVdrwI73EeWCBqBwG8tVOA" receiveEvent="_kVdrwY73EeWCBqBwG8tVOA" signature="_yHIvQIyvEeWEC_ZIrSpDtg"/>
+      <properties xmi:id="_ipDNR473EeWCBqBwG8tVOA" name="target" lowerBound="1" type="_08SL8Iv1EeWiz_K4Hp_mDw"/>
+      <formalGates xmi:id="_ipDNSI73EeWCBqBwG8tVOA" message="_ipDNRY73EeWCBqBwG8tVOA" name="in_doSomething6"/>
+      <formalGates xmi:id="_ipDNSY73EeWCBqBwG8tVOA" message="_ipDNRo73EeWCBqBwG8tVOA" name="out_doSomething6"/>
+    </specification>
+  </messageViews>
   <layout xmi:id="__vs9IIvzEeWiz_K4Hp_mDw">
     <containers xmi:id="__vs9IYvzEeWiz_K4Hp_mDw" key="__vrH8YvzEeWiz_K4Hp_mDw">
       <value xmi:id="_08TaEIv1EeWiz_K4Hp_mDw" key="_08SL8Iv1EeWiz_K4Hp_mDw">
@@ -331,6 +357,11 @@
     <containers xmi:id="_6FWvcI4iEeWvxYxQu-HyyQ" key="_6FWvc44iEeWvxYxQu-HyyQ">
       <value xmi:id="_6FWvcY4iEeWvxYxQu-HyyQ" key="_6FXWg44iEeWvxYxQu-HyyQ">
         <value xmi:id="_6FWvco4iEeWvxYxQu-HyyQ" x="100.0" y="100.0"/>
+      </value>
+    </containers>
+    <containers xmi:id="_ipAxAI73EeWCBqBwG8tVOA" key="_ipDNQI73EeWCBqBwG8tVOA">
+      <value xmi:id="_ipCmMI73EeWCBqBwG8tVOA" key="_ipDNRI73EeWCBqBwG8tVOA">
+        <value xmi:id="_ipCmMY73EeWCBqBwG8tVOA" x="100.0" y="100.0"/>
       </value>
     </containers>
   </layout>
