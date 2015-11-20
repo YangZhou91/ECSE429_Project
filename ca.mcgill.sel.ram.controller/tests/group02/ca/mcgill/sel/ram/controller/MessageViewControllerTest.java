@@ -2,6 +2,7 @@ package ca.mcgill.sel.ram.controller;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -461,32 +462,82 @@ public class MessageViewControllerTest {
     }
 
     /**
-     * Need 2 paths alternating removedFromCovered<br>
-     * Use removedFromCovered = true <br>
+     * Need 2 paths alternating removeFromCovered<br>
+     * Use removeFromCovered = true <br>
      * Test method for {@link MessageViewController#appendRemoveEmptyLifelinesCommand
      * (EditingDomain, CompoundCommand, Interaction, List, boolean)}.
      */
     @Test
     public void testAppendRemoveEmptyLifelinesCommand01() {
         Classifier classA = aspect.getStructuralView().getClasses().get(0);
-        Operation doSomething = classA.getOperations().get(0);   
+        Operation doSomething7 = classA.getOperations().get(6);   
                 
-        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething2);
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething7);
         Interaction owner = messageView.getSpecification();
         EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
         
-        MessageViewController.appendRemoveEmptyLifelinesCommand(domain, compoundCommand, 
-                owner, combinedFragments, true);
+        CombinedFragment cf1 = (CombinedFragment) owner.getFragments().get(1);
+        CombinedFragment cf2 = (CombinedFragment) owner.getFragments().get(2);
+        CombinedFragment cf3 = (CombinedFragment) owner.getFragments().get(3);
         
+        CompoundCommand compoundCommand = new CompoundCommand();
+        compoundCommand.append(RemoveCommand.create(domain, cf3));
+        compoundCommand.append(RemoveCommand.create(domain, owner.getMessages().get(0)));
+        compoundCommand.append(RemoveCommand.create(domain, owner.getLifelines().get(2).getCoveredBy()));
+        
+        List<CombinedFragment> combinedFragments = new ArrayList<CombinedFragment>();
+        combinedFragments.add(cf1);
+        combinedFragments.add(cf2);
+        
+        int numCommand = compoundCommand.getCommandList().size();
+        
+        MessageViewController.appendRemoveEmptyLifelinesCommand(domain, compoundCommand, 
+                owner, combinedFragments, true);        
+        
+        // Only one lifeline should be removed (classC)
+        // The method is supposed to add 2 command for every deleted lifelines
+        // (if removeFromCovered == true, we would expect an
+        // additional numLifelineDeleted * numCombinedFragments commands)
+        assertEquals(numCommand + 2 + (1 * combinedFragments.size()), 
+                compoundCommand.getCommandList().size());
     }
     
     /**
-     * Use removedFromCovered = false. <br>
+     * Use removeFromCovered = false. <br>
      * @see #testAppendRemoveEmptyLifelinesCommand01()
      */
     @Test
     public void testAppendRemoveEmptyLifelinesCommand02() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething7 = classA.getOperations().get(6);   
+                
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething7);
+        Interaction owner = messageView.getSpecification();
+        EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
         
+        CombinedFragment cf1 = (CombinedFragment) owner.getFragments().get(1);
+        CombinedFragment cf2 = (CombinedFragment) owner.getFragments().get(2);
+        CombinedFragment cf3 = (CombinedFragment) owner.getFragments().get(3);
+        
+        CompoundCommand compoundCommand = new CompoundCommand();
+        compoundCommand.append(RemoveCommand.create(domain, cf3));
+        compoundCommand.append(RemoveCommand.create(domain, owner.getMessages().get(0)));
+        compoundCommand.append(RemoveCommand.create(domain, owner.getLifelines().get(2).getCoveredBy()));
+        
+        List<CombinedFragment> combinedFragments = new ArrayList<CombinedFragment>();
+        combinedFragments.add(cf1);
+        combinedFragments.add(cf2);
+        
+        int numCommand = compoundCommand.getCommandList().size();
+        
+        MessageViewController.appendRemoveEmptyLifelinesCommand(domain, compoundCommand, 
+                owner, combinedFragments, false);
+        
+        // Only one lifeline should be removed (classC)
+        // The method is supposed to add 2 command for every deleted lifelines
+        // (if removeFromCovered == true, we would expect an
+        // additional numLifeline * numCombinedFragments commands)
+        assertEquals(numCommand + 2, compoundCommand.getCommandList().size());
     }
 
     /**
