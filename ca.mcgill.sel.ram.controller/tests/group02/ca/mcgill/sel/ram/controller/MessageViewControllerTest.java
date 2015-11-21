@@ -135,8 +135,8 @@ public class MessageViewControllerTest {
         LayoutElement lifelineLayout = myMap.get(newLifeline);
 
         assertEquals(lifelineCount + 1, owner.getLifelines().size());
-        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
-        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
+        assertEquals(0f, lifelineLayout.getX(), Float.MIN_VALUE);
+        assertEquals(0f, lifelineLayout.getY(), Float.MIN_VALUE);
     }
 
     /**
@@ -199,10 +199,10 @@ public class MessageViewControllerTest {
         EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
         LayoutElement lifelineLayout = myMap.get(newLifeline);
         
-        assertEquals(owner.getLifelines().size(), previousLifelineCount + 1);
-        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
-        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
-        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
+        assertEquals(previousLifelineCount + 1, owner.getLifelines().size());
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
+        assertEquals(0f, lifelineLayout.getX(), Float.MIN_VALUE);
+        assertEquals(0f, lifelineLayout.getY(), Float.MIN_VALUE);
     }
     
     /**
@@ -248,10 +248,10 @@ public class MessageViewControllerTest {
         EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
         LayoutElement lifelineLayout = myMap.get(newLifeline);
         
-        assertEquals(owner.getLifelines().size(), previousLifelineCount + 1);
-        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
-        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
-        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
+        assertEquals(previousLifelineCount + 1, owner.getLifelines().size());
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
+        assertEquals(0f, lifelineLayout.getX(), Float.MIN_VALUE);
+        assertEquals(0f, lifelineLayout.getY(), Float.MIN_VALUE);
     }
     
     /**
@@ -285,10 +285,10 @@ public class MessageViewControllerTest {
         EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
         LayoutElement lifelineLayout = myMap.get(newLifeline);
         
-        assertEquals(owner.getLifelines().size(), previousLifelineCount + 1);
-        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
-        assertEquals(lifelineLayout.getX(), 0f, Float.MIN_VALUE);
-        assertEquals(lifelineLayout.getY(), 0f, Float.MIN_VALUE);
+        assertEquals(previousLifelineCount + 1, owner.getLifelines().size());
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
+        assertEquals(0f, lifelineLayout.getX(), Float.MIN_VALUE);
+        assertEquals(0f, lifelineLayout.getY(), Float.MIN_VALUE);
     }
 
     /**
@@ -306,8 +306,8 @@ public class MessageViewControllerTest {
         float y = lifelineLayout.getY();
         controller.moveLifeline(lifeline, x * x, x * x);
         
-        assertEquals(lifelineLayout.getX(), x * x, Float.MIN_VALUE);
-        assertEquals(lifelineLayout.getY(), y * y, Float.MIN_VALUE);
+        assertEquals(x * x, lifelineLayout.getX(), Float.MIN_VALUE);
+        assertEquals(y * y, lifelineLayout.getY(), Float.MIN_VALUE);
     }
 
     /**
@@ -346,7 +346,7 @@ public class MessageViewControllerTest {
         
         controller.createMessage(owner, lifelineFrom, lifelineTo, owner, doSomething, addAtIndex);
         
-        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
     }
     
     /**
@@ -378,7 +378,7 @@ public class MessageViewControllerTest {
         
         controller.createMessage(owner, lifelineFrom, lifelineTo, container, getRandom, addAtIndex);
         
-        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
     }
     
     /**
@@ -407,7 +407,7 @@ public class MessageViewControllerTest {
         
         controller.createMessage(owner, lifelineFrom, lifelineTo, container, doSomething, addAtIndex);
         
-        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
     }
 
     /**
@@ -435,7 +435,7 @@ public class MessageViewControllerTest {
         
         controller.createReplyMessage(owner, lifelineFrom, lifelineTo, container, replyInt, addAtIndex);
         
-        assertEquals(owner.getMessages().size(), previousMessageCount + 1);
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
     }
 
     /**
@@ -458,7 +458,7 @@ public class MessageViewControllerTest {
         // Delete sendEvent (which should delete 3 messages in total)
         controller.removeMessages(owner, owner, sendEvent);
         
-        assertEquals(owner.getMessages().size(), previousMessageCount - 3);
+        assertEquals(previousMessageCount - 3, owner.getMessages().size());
     }
 
     /**
@@ -579,8 +579,167 @@ public class MessageViewControllerTest {
      * (EditingDomain, Interaction, FragmentContainer, MessageOccurrenceSpecification)}.
      */
     @Test
-    public void testCreateRemoveMessagesCommand() {
-        fail("Not yet implemented");
+    public void testCreateRemoveMessagesCommand01() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething8 = classA.getOperations().get(7);   
+                
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething8);
+        Interaction owner = messageView.getSpecification();
+        EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
+        
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(1);
+        FragmentContainer container = cf.getOperands().get(0);
+        MessageOccurrenceSpecification sendEvent = (MessageOccurrenceSpecification) container.getFragments().get(0);
+        
+        CompoundCommand cc = MessageViewController.createRemoveMessagesCommand(domain, owner, 
+                container, sendEvent);
+        
+        assertEquals(9, cc.getCommandList().size());
+    }
+    
+    /**
+     * Test for remove a reply message.<br>
+     * @see #testCreateRemoveMessagesCommand01()
+     */
+    @Test
+    public void testCreateRemoveMessagesCommand02() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething8 = classA.getOperations().get(7);   
+                
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething8);
+        Interaction owner = messageView.getSpecification();
+        EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
+        MessageOccurrenceSpecification sendEvent = (MessageOccurrenceSpecification) owner.getFragments().get(
+                owner.getFragments().size() - 1);
+        
+        CompoundCommand cc = MessageViewController.createRemoveMessagesCommand(domain, owner, 
+                owner, sendEvent);
+        
+        // 2 commands + 1 command for the message occurrence
+        assertEquals(2 + 1, cc.getCommandList().size());
+    }
+    
+    /**
+     * Test case: when currentFragment !instanceof MessageOccurence.
+     * @see #testCreateRemoveMessagesCommand01()
+     */
+    @Test
+    public void testCreateRemoveMessagesCommand03() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething6 = classA.getOperations().get(5);
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething6);
+        
+        Interaction owner = messageView.getSpecification();
+        EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
+        MessageOccurrenceSpecification sendEvent = (MessageOccurrenceSpecification) owner.getFragments().get(0);
+        
+        CompoundCommand cc = MessageViewController.createRemoveMessagesCommand(domain, owner, 
+                owner, sendEvent);
+        
+        // 2 commands + 1 command for the message occurrence
+        assertEquals(2 + 1, cc.getCommandList().size());
+    }
+    
+    /**
+     * Test case: messageEnd.getMessage().getReceiveEvent() != messageEnd <br>
+     * structuralFeature != null && structuralFeature.eContainer() == initialMessage.
+     * @see #testCreateRemoveMessagesCommand01()
+     */
+    @Test
+    public void testCreateRemoveMessgesCommand04() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething4 = classA.getOperations().get(3);
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething4);
+        
+        Interaction owner = messageView.getSpecification();
+        EditingDomain domain = EMFEditUtil.getEditingDomain(owner);
+        MessageOccurrenceSpecification sendEvent = (MessageOccurrenceSpecification) owner.getFragments().get(1);
+        
+        CompoundCommand cc = MessageViewController.createRemoveMessagesCommand(domain, owner, 
+                owner, sendEvent);
+        
+        // 2 commands + 1 for initialMessage, + 2 message occurrence on both sides
+        assertEquals(2 + 1 + 2, cc.getCommandList().size());
     }
 
+    
+    /************************************************
+     * EXTRA TEST CASES FOR ACHIEVING HIGHER COVERAGE
+     ************************************************/
+    
+    /**
+     * Extra test 1: Creating message with more parameters.
+     */
+    @Test
+    public void testCreateMessage04() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething5 = classA.getOperations().get(4);   
+
+        Classifier classB = aspect.getStructuralView().getClasses().get(1);
+        Operation setValue = classB.getOperations().get(0);
+        
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething5);
+        Interaction owner = messageView.getSpecification();
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+        Lifeline lifelineTo = owner.getLifelines().get(1);
+
+        int addAtIndex = 1;
+
+        int previousMessageCount = owner.getMessages().size();
+        
+        controller.createMessage(owner, lifelineFrom, lifelineTo, owner, setValue, addAtIndex);
+        
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
+    }
+    
+    /**
+     * Extra test 2: Creating a destroy message.
+     */
+    @Test
+    public void testCreateMessage05() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething9 = classA.getOperations().get(8);   
+
+        Classifier classD = aspect.getStructuralView().getClasses().get(3);
+        Operation destroy = classD.getOperations().get(1);
+        
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething9);
+        Interaction owner = messageView.getSpecification();
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+        Lifeline lifelineTo = owner.getLifelines().get(1);
+
+        int addAtIndex = 2;
+
+        int previousMessageCount = owner.getMessages().size();
+        
+        controller.createMessage(owner, lifelineFrom, lifelineTo, owner, destroy, addAtIndex);
+        
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
+    }
+    
+    /**
+     * Extra test 3: Creating a message with undefined messageView.
+     */
+    @Test
+    public void testCreateMessage06() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething9 = classA.getOperations().get(8);   
+
+        Classifier classD = aspect.getStructuralView().getClasses().get(3);
+        Operation getState = classD.getOperations().get(2);
+        
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething9);
+        Interaction owner = messageView.getSpecification();
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+        Lifeline lifelineTo = owner.getLifelines().get(1);
+
+        int addAtIndex = 2;
+
+        int previousMessageCount = owner.getMessages().size();
+        
+        controller.createMessage(owner, lifelineFrom, lifelineTo, owner, getState, addAtIndex);
+        
+        // adds a send and reply 
+        assertEquals(previousMessageCount + 2, owner.getMessages().size());
+    }
 }
