@@ -1,11 +1,11 @@
 package ca.mcgill.sel.ram.ui.views.message.handler.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.event.MouseEvent;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +35,6 @@ import ca.mcgill.sel.ram.ui.RamApp;
 import ca.mcgill.sel.ram.ui.scenes.DisplayAspectScene;
 import ca.mcgill.sel.ram.ui.views.message.LifelineView;
 import ca.mcgill.sel.ram.ui.views.message.MessageViewView;
-import ca.mcgill.sel.ram.ui.views.message.handler.IMessageViewHandler;
 import ca.mcgill.sel.ram.ui.views.message.handler.MessageViewHandlerFactory;
 import ca.mcgill.sel.ram.util.RAMModelUtil;
 import ca.mcgill.sel.ram.util.RamResourceFactoryImpl;
@@ -378,6 +377,62 @@ public class MessageViewHandlerTest {
         // Try to click one of the options (click on the destroy method)
         click(app, 400, 260);
         
+        waitNextRenderLoop(app);
+
+        // Pop up have disappeared, and message should have increased by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousMessageCount + 1, messageView.getSpecification().getMessages().size());
+    }
+    
+    /**
+     * Test case 7: Gesture is ended and reaches a lifeline that has no fragment. <br>
+     * @throws InterruptedException if interrupted
+     * @see #testProcessUnistrokeEvent01()
+     */
+    @Test
+    public void testProcessUnistrokeEvent07() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething4 = classA.getOperations().get(3);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething4);        
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        int previousMessageCount = messageView.getSpecification().getMessages().size();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        InputCursor cursor = new InputCursor();
+        cursor.getEvents().add(new MTFingerInputEvt(null, 160, 180, 0, cursor));        
+        cursor.getEvents().add(new MTFingerInputEvt(null, 470, 180, 0, cursor));        
+        final UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_ENDED, 
+                mvv, null, null, cursor);
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        // Process the event
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.processUnistrokeEvent(event);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        // A selector should have popped up
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Try to click one of the options (click on the destroy method)
+        click(app, 480, 210);        
         waitNextRenderLoop(app);
 
         // Pop up have disappeared, and message should have increased by 1
@@ -767,7 +822,7 @@ public class MessageViewHandlerTest {
             }
         });
         
-        // This waits for the click to actually happen
+        // This waits for the next render loop
         unitTestWait();
     }
 
