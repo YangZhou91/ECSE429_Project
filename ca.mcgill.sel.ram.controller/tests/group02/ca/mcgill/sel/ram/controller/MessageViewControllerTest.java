@@ -1,11 +1,9 @@
 package ca.mcgill.sel.ram.controller;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.util.EMap;
@@ -21,14 +19,12 @@ import org.junit.Test;
 
 import ca.mcgill.sel.commons.emf.util.AdapterFactoryRegistry;
 import ca.mcgill.sel.commons.emf.util.EMFEditUtil;
-import ca.mcgill.sel.commons.emf.util.EMFModelUtil;
 import ca.mcgill.sel.commons.emf.util.ResourceManager;
 import ca.mcgill.sel.ram.Aspect;
 import ca.mcgill.sel.ram.Classifier;
 import ca.mcgill.sel.ram.CombinedFragment;
 import ca.mcgill.sel.ram.FragmentContainer;
 import ca.mcgill.sel.ram.Interaction;
-import ca.mcgill.sel.ram.InteractionFragment;
 import ca.mcgill.sel.ram.LayoutElement;
 import ca.mcgill.sel.ram.Lifeline;
 import ca.mcgill.sel.ram.Message;
@@ -39,9 +35,7 @@ import ca.mcgill.sel.ram.RamFactory;
 import ca.mcgill.sel.ram.RamPackage;
 import ca.mcgill.sel.ram.Reference;
 import ca.mcgill.sel.ram.TypedElement;
-import ca.mcgill.sel.ram.impl.ContainerMapImpl;
 import ca.mcgill.sel.ram.provider.RamItemProviderAdapterFactory;
-import ca.mcgill.sel.ram.provider.util.RAMEditUtil;
 import ca.mcgill.sel.ram.util.RAMModelUtil;
 import ca.mcgill.sel.ram.util.RamResourceFactoryImpl;
 
@@ -103,13 +97,13 @@ public class MessageViewControllerTest {
         ResourceManager.unloadResource(aspect.eResource());
     }
 
-//    /**
-//     * Test method for {@link MessageViewController#MessageViewController()}.
-//     */
-//    @Test
-//    public void testMessageViewController() {
-//        fail("Not yet implemented");
-//    }
+    /**
+     * Test method for {@link MessageViewController#MessageViewController()}.
+     */
+    @Test
+    public void testMessageViewController() {
+        // Nothing to test here
+    }
 
     /**
      * One test case can cover all paths (there is only 1) <br>
@@ -231,6 +225,7 @@ public class MessageViewControllerTest {
         Lifeline lifelineFrom = owner.getLifelines().get(0);
         
         // TODO Find a way to make newlifeline covered by combined fragments
+        // Impossible perhaps?
         
         CombinedFragment cf = (CombinedFragment) owner.getFragments().get(2);
         FragmentContainer container = cf.getOperands().get(0);
