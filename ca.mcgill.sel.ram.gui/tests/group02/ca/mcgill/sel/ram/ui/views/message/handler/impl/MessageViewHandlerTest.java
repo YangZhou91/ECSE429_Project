@@ -2,11 +2,14 @@ package ca.mcgill.sel.ram.ui.views.message.handler.impl;
 
 import static org.junit.Assert.*;
 
+import java.awt.event.MouseEvent;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mt4j.components.MTComponent;
 import org.mt4j.components.visibleComponents.shapes.MTPolygon;
 import org.mt4j.input.inputData.InputCursor;
 import org.mt4j.input.inputData.MTFingerInputEvt;
@@ -14,12 +17,15 @@ import org.mt4j.input.inputProcessors.MTGestureEvent;
 import org.mt4j.input.inputProcessors.componentProcessors.unistrokeProcessor.UnistrokeEvent;
 import org.mt4j.sceneManagement.ISceneChangeListener;
 import org.mt4j.sceneManagement.SceneChangeEvent;
+import org.mt4j.util.math.Vector3D;
 import org.mt4j.util.math.Vertex;
 
 import ca.mcgill.sel.commons.emf.util.AdapterFactoryRegistry;
 import ca.mcgill.sel.commons.emf.util.ResourceManager;
 import ca.mcgill.sel.ram.Aspect;
 import ca.mcgill.sel.ram.Classifier;
+import ca.mcgill.sel.ram.CombinedFragment;
+import ca.mcgill.sel.ram.FragmentContainer;
 import ca.mcgill.sel.ram.Interaction;
 import ca.mcgill.sel.ram.MessageView;
 import ca.mcgill.sel.ram.Operation;
@@ -27,6 +33,7 @@ import ca.mcgill.sel.ram.RamPackage;
 import ca.mcgill.sel.ram.provider.RamItemProviderAdapterFactory;
 import ca.mcgill.sel.ram.ui.RamApp;
 import ca.mcgill.sel.ram.ui.scenes.DisplayAspectScene;
+import ca.mcgill.sel.ram.ui.views.message.LifelineView;
 import ca.mcgill.sel.ram.ui.views.message.MessageViewView;
 import ca.mcgill.sel.ram.ui.views.message.handler.IMessageViewHandler;
 import ca.mcgill.sel.ram.ui.views.message.handler.MessageViewHandlerFactory;
@@ -136,9 +143,13 @@ public class MessageViewHandlerTest {
     @Test
     public void testProcessUnistrokeEvent01() {
         UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_CANCELED, null, null, null, null);
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
         handler.processUnistrokeEvent(event);
         
-        // Nothing should have changed
+        // Nothing should have changed (no message, lifeline added)
+        assertEquals(previousChildCount, topLayer.getChildCount());
     }
     
     /**
@@ -170,9 +181,15 @@ public class MessageViewHandlerTest {
         MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
         UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_STARTED, 
                 mvv, visualization, null, null);
+        
+        int previousChildCount = mvv.getUnistrokeLayer().getChildCount();
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int topLayerChildCount = topLayer.getChildCount();
+        
         handler.processUnistrokeEvent(event);
         
-        // TODO: unistroke layer has one more child
+        assertEquals(previousChildCount + 1, mvv.getUnistrokeLayer().getChildCount());
+        assertEquals(topLayerChildCount, topLayer.getChildCount());
     }
     
     /**
@@ -204,9 +221,14 @@ public class MessageViewHandlerTest {
         cursor.getEvents().add(new MTFingerInputEvt(null, 1, 0, 0, cursor));        
         UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_UPDATED, 
                 mvv, null, null, cursor);
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
         handler.processUnistrokeEvent(event);
         
-        // TODO: Nothing should have happened
+        // Nothing should have happened
+        assertEquals(previousChildCount, topLayer.getChildCount());
     }
     
     /**
@@ -238,10 +260,13 @@ public class MessageViewHandlerTest {
         cursor.getEvents().add(new MTFingerInputEvt(null, 6, 0, 0, cursor));        
         UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_UPDATED, 
                 mvv, null, null, cursor);
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
         handler.processUnistrokeEvent(event);
         
-        // Nothing happens, but lifeline highlighted maybe
-        // TODO: don't know who to check that
+        // Nothing happens, and no lifeline highlighted because there is only one lifeline
+        assertEquals(previousChildCount, topLayer.getChildCount());
     }
     
     /**
@@ -256,6 +281,7 @@ public class MessageViewHandlerTest {
         Operation doSomething1 = classA.getOperations().get(0);
         final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething1);        
         final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        int previousLifelineCount = messageView.getSpecification().getLifelines().size();
         
         // Changes the scene
         app.invokeLater(new Runnable() {
@@ -274,6 +300,9 @@ public class MessageViewHandlerTest {
         final UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_ENDED, 
                 mvv, null, null, cursor);
         
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
         // Process the event
         app.invokeLater(new Runnable() {
             @Override
@@ -283,8 +312,20 @@ public class MessageViewHandlerTest {
             }
         });
         unitTestWait();
+
+        // A selector should have popped up
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
         
-        // TODO: Added component in aspectScene
+        // Try to click one of the options
+        click(app, 275, 250);
+        
+        // Clicks the create method (which should increase lifeline count and pop-up disappears)
+        click(app, 140, 120);
+        
+        waitNextRenderLoop(app);
+
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousLifelineCount + 1, messageView.getSpecification().getLifelines().size());
     }
 
     /**
@@ -299,6 +340,7 @@ public class MessageViewHandlerTest {
         Operation doSomething2 = classA.getOperations().get(1);
         final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething2);        
         final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        int previousMessageCount = messageView.getSpecification().getMessages().size();
         
         // Changes the scene
         app.invokeLater(new Runnable() {
@@ -317,6 +359,9 @@ public class MessageViewHandlerTest {
         final UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_ENDED, 
                 mvv, null, null, cursor);
         
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
         // Process the event
         app.invokeLater(new Runnable() {
             @Override
@@ -327,7 +372,17 @@ public class MessageViewHandlerTest {
         });
         unitTestWait();
         
-        // TODO: Added component in aspectScene
+        // A selector should have popped up
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Try to click one of the options (click on the destroy method)
+        click(app, 400, 260);
+        
+        waitNextRenderLoop(app);
+
+        // Pop up have disappeared, and message should have increased by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousMessageCount + 1, messageView.getSpecification().getMessages().size());
     }
     
     /**
@@ -366,15 +421,290 @@ public class MessageViewHandlerTest {
     }
 
     /**
+     * Test case 1: Create fragment and click create statement. <br>
      * Test method for {@link ca.mcgill.sel.ram.ui.views.message.handler.impl.MessageViewHandler
      * #handleCreateFragment(ca.mcgill.sel.ram.ui.views.message.MessageViewView, 
      * ca.mcgill.sel.ram.ui.views.message.LifelineView, 
      * org.mt4j.util.math.Vector3D, 
      * ca.mcgill.sel.ram.FragmentContainer)}.
+     * @throws InterruptedException if interrupted.
      */
     @Test
-    public void testHandleCreateFragment() {
-        fail("Not yet implemented");
+    public void testHandleCreateFragment01() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething1 = classA.getOperations().get(0);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething1);
+        final Interaction owner = messageView.getSpecification();
+        int previousFragmentCount = owner.getFragments().size();
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        final MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        final LifelineView llv = mvv.getLifelineView(owner.getLifelines().get(0));
+        
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.handleCreateFragment(mvv, llv, new Vector3D(160, 180), owner);
+                appNotify();
+            }
+        });
+        
+        unitTestWait();
+        
+        // A pop-up should appear
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Now try to click create statement
+        click(app, 150, 180);
+        waitNextRenderLoop(app);
+        
+        // Pop should disappear and fragment count increased by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousFragmentCount + 1, owner.getFragments().size());
+    }
+    
+    /**
+     * Test case 2: Create fragment and click create combined fragment.
+     * @throws InterruptedException if interrupted 
+     * @see #testHandleCreateFragment01()
+     */
+    @Test
+    public void testHandleCreateFragment02() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething1 = classA.getOperations().get(0);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething1);
+        final Interaction owner = messageView.getSpecification();
+        int previousFragmentCount = owner.getFragments().size();
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        final MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        final LifelineView llv = mvv.getLifelineView(owner.getLifelines().get(0));
+        
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.handleCreateFragment(mvv, llv, new Vector3D(160, 180), owner);
+                appNotify();
+            }
+        });
+        
+        unitTestWait();
+        
+        // A pop-up should appear
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Now try to click create combined fragment
+        click(app, 150, 210);
+        waitNextRenderLoop(app);
+        
+        // Pop should disappear and fragment count increased by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousFragmentCount + 1, owner.getFragments().size());
+    }
+    
+    /**
+     * Test case 3: Create fragment and click create assignment.
+     * @throws InterruptedException if interrupted 
+     * @see #testHandleCreateFragment01()
+     */
+    @Test
+    public void testHandleCreateFragment03() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething2 = classA.getOperations().get(1);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething2);
+        final Interaction owner = messageView.getSpecification();
+        int previousFragmentCount = owner.getFragments().size();
+        
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        final MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        final LifelineView llv = mvv.getLifelineView(owner.getLifelines().get(1));
+        
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.handleCreateFragment(mvv, llv, new Vector3D(400, 230), owner);
+                appNotify();
+            }
+        });
+        
+        unitTestWait();
+        
+        // A pop-up should appear
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Now try to click create combined fragment
+        click(app, 400, 200);
+        waitNextRenderLoop(app);
+        
+        // Pop should disappear and fragment count increased by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousFragmentCount + 1, owner.getFragments().size());
+    }
+    
+    /**
+     * Test case 4: Create fragment and click create self message.
+     * @throws InterruptedException if interrupted 
+     * @see #testHandleCreateFragment01()
+     */
+    @Test
+    public void testHandleCreateFragment04() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething3 = classA.getOperations().get(2);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething3);
+        Interaction owner = messageView.getSpecification();
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(1);
+        final FragmentContainer container = cf.getOperands().get(0);
+        int previousMessageCount = owner.getMessages().size();
+        int previousFragmentCount = container.getFragments().size();
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        final MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        final LifelineView llv = mvv.getLifelineView(owner.getLifelines().get(0));
+        
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.handleCreateFragment(mvv, llv, new Vector3D(160, 230), container);
+                appNotify();
+            }
+        });
+        
+        unitTestWait();
+        
+        // A pop-up should appear
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Now try to click create self message
+        click(app, 160, 280);
+        waitNextRenderLoop(app);
+        
+        // Pop up should show different options, but still here
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Now try to click a method
+        click(app, 125, 125);
+        waitNextRenderLoop(app);
+        
+        // Pop should disappear and fragment count increased by 2 (2 new message occurrence)
+        // And message count by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousFragmentCount + 2, container.getFragments().size());
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
+    }
+    
+    /**
+     * Test case 5: Create fragment and click create reply message.
+     * @throws InterruptedException if interrupted 
+     * @see #testHandleCreateFragment01()
+     */
+    @Test
+    public void testHandleCreateFragment05() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething3 = classA.getOperations().get(2);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething3);
+        Interaction owner = messageView.getSpecification();
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(1);
+        final FragmentContainer container = cf.getOperands().get(0);
+        int previousMessageCount = owner.getMessages().size();
+        int previousFragmentCount = container.getFragments().size();
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        final MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        final LifelineView llv = mvv.getLifelineView(owner.getLifelines().get(0));
+        
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.handleCreateFragment(mvv, llv, new Vector3D(160, 230), container);
+                appNotify();
+            }
+        });
+        
+        unitTestWait();
+        
+        // A pop-up should appear
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Now try to click create reply message
+        click(app, 160, 310);
+        waitNextRenderLoop(app);
+                
+        // Pop should disappear and fragment count increased by 1
+        // And message count by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousFragmentCount + 1, container.getFragments().size());
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
     }
     
     /**
@@ -398,6 +728,47 @@ public class MessageViewHandlerTest {
             waiter.notify();
             mayProceed = true;
         }
+    }
+    
+    /**
+     * Simulates a click.
+     * @param app The app.
+     * @param x The x position.
+     * @param y The y position.
+     * @throws InterruptedException if interrupted
+     */
+    private static void click(RamApp app, int x, int y) throws InterruptedException {
+        app.dispatchEvent(new MouseEvent(app, MouseEvent.MOUSE_PRESSED, 0, 
+                MouseEvent.BUTTON1_MASK, x, y, x, y, 1, false, MouseEvent.BUTTON1));
+        app.dispatchEvent(new MouseEvent(app, MouseEvent.MOUSE_RELEASED, 0, 
+                MouseEvent.BUTTON1_MASK, x, y, x, y, 1, false, MouseEvent.BUTTON1));
+        
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                appNotify();
+            }
+        });
+        
+        // This waits for the click to actually happen
+        unitTestWait();
+    }
+    
+    /**
+     * Waits for the next render loop.
+     * @param app The app.
+     * @throws InterruptedException if interrupted.
+     */
+    private static void waitNextRenderLoop(RamApp app) throws InterruptedException {
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                appNotify();
+            }
+        });
+        
+        // This waits for the click to actually happen
+        unitTestWait();
     }
 
 }
