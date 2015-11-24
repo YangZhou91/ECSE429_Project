@@ -434,13 +434,14 @@ public class MessageViewControllerTest {
     }
 
     /**
-     * One path to cover all (not sure if assigning a boolean is c-use or p-use)
+     * One path to cover all through method (not sure if using boolean variable is p-use or c-use, 
+     * although it's handled in extra test 4)
      * <br>
      * Test method for {@link MessageViewController#removeMessages
      * (Interaction, FragmentContainer, MessageOccurrenceSpecification)}.
      */
     @Test
-    public void testRemoveMessages() {
+    public void testRemoveMessages01() {
         Classifier classA = aspect.getStructuralView().getClasses().get(0);
         Operation doSomething5 = classA.getOperations().get(4);   
                 
@@ -736,5 +737,28 @@ public class MessageViewControllerTest {
         
         // adds a send and reply 
         assertEquals(previousMessageCount + 2, owner.getMessages().size());
+    }
+    
+    /**
+     * Extra test 4: Removing messages with empty combined fragments.
+     * @see #testRemoveMessages01()
+     */
+    @Test
+    public void testRemoveMessages02() {
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething10 = classA.getOperations().get(9);   
+                
+        MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething10);
+        Interaction owner = messageView.getSpecification();
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(1);
+        FragmentContainer container = cf.getOperands().get(0);
+        MessageOccurrenceSpecification sendEvent = (MessageOccurrenceSpecification) container.getFragments().get(0);
+        
+        int previousMessageCount = owner.getMessages().size();
+        
+        // Delete sendEvent (which should delete 3 messages in total)
+        controller.removeMessages(owner, container, sendEvent);
+        
+//        assertEquals(previousMessageCount - 3, owner.getMessages().size());
     }
 }
