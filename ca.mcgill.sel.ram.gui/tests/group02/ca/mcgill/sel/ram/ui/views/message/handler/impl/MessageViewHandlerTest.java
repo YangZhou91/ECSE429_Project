@@ -825,5 +825,67 @@ public class MessageViewHandlerTest {
         // This waits for the next render loop
         unitTestWait();
     }
-
+    
+    /**************************************
+     * EXTRA TEST CASES FOR HIGHER COVERAGE
+     **************************************/
+    /**
+     * Extra test 1: Create fragment after a send event.
+     * @throws InterruptedException if interrupted
+     */
+    @Test
+    public void testHandleCreateFragment06() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething5 = classA.getOperations().get(4);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething5);
+        Interaction owner = messageView.getSpecification();
+        System.out.println(owner.getFragments());
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(3);
+        final FragmentContainer container = cf.getOperands().get(0);
+        System.out.println(container.getFragments());
+        System.out.println(container.getFragments().get(6));
+        CombinedFragment innerCf = (CombinedFragment) container.getFragments().get(6);
+        final FragmentContainer innerContainer = innerCf.getOperands().get(0);
+        System.out.println(innerContainer.getFragments().size());
+        int previousMessageCount = owner.getMessages().size();
+        int previousFragmentCount = container.getFragments().size();
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        final MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        final LifelineView llv = mvv.getLifelineView(owner.getLifelines().get(0));
+        
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.handleCreateFragment(mvv, llv, new Vector3D(160, 595), container);
+                appNotify();
+            }
+        });
+        
+        unitTestWait();
+        // A pop-up should appear
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // Now try to click create combined fragments
+        click(app, 160, 630);
+        waitNextRenderLoop(app);
+                
+        // Pop should disappear and fragment count increased by 1
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousFragmentCount + 1, container.getFragments().size());
+    }
 }
