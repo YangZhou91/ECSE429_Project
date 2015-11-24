@@ -9,6 +9,8 @@ import static org.junit.Assert.*;
 
 import java.awt.event.MouseEvent;
 
+import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.ecore.EObject;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,10 +34,13 @@ import ca.mcgill.sel.ram.Classifier;
 import ca.mcgill.sel.ram.CombinedFragment;
 import ca.mcgill.sel.ram.FragmentContainer;
 import ca.mcgill.sel.ram.Interaction;
+import ca.mcgill.sel.ram.LayoutElement;
 import ca.mcgill.sel.ram.Lifeline;
 import ca.mcgill.sel.ram.MessageView;
 import ca.mcgill.sel.ram.Operation;
+import ca.mcgill.sel.ram.RamFactory;
 import ca.mcgill.sel.ram.RamPackage;
+import ca.mcgill.sel.ram.Reference;
 import ca.mcgill.sel.ram.provider.RamItemProviderAdapterFactory;
 import ca.mcgill.sel.ram.ui.RamApp;
 import ca.mcgill.sel.ram.ui.scenes.DisplayAspectScene;
@@ -329,6 +334,93 @@ public class MessageViewHandlerIntegrationTest {
         assertEquals(previousMessageCount + 1, owner.getMessages().size());
 
         // Integration test check CreateMessage
+        assertEquals(previousMessageCount + 1, owner.getMessages().size());
+    }
+
+    /**
+     * Gesture is ended and does not reaches a lifeline. <br>
+     * Integration test createLifelinewithMessage
+     * 
+     * @throws InterruptedException if interrupted
+     * @see #testProcessUnistrokeEvent01()
+     */
+    @Test
+    public void test03() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething1 = classA.getOperations().get(0);
+        Operation doSomething6 = classA.getOperations().get(5);
+
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething6);
+        Interaction owner = messageView.getSpecification();
+
+        Classifier classC = aspect.getStructuralView().getClasses().get(2);
+        Operation getRandom = classC.getOperations().get(1);
+        Reference classCType = RamFactory.eINSTANCE.createReference();
+        classCType.setType(classC);
+
+        Lifeline lifelineFrom = owner.getLifelines().get(0);
+
+        CombinedFragment cf = (CombinedFragment) owner.getFragments().get(1);
+        FragmentContainer container = cf.getOperands().get(0);
+        int previousFragIndex = container.getFragments().size() - 1;
+
+        int previousLifelineCount = owner.getLifelines().size();
+        int previousMessageCount = owner.getMessages().size();
+        // final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething1);
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        // int previousLifelineCount = messageView.getSpecification().getLifelines().size();
+
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+
+        MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        InputCursor cursor = new InputCursor();
+        cursor.getEvents().add(new MTFingerInputEvt(null, 160, 180, 0, cursor));
+        cursor.getEvents().add(new MTFingerInputEvt(null, 260, 180, 0, cursor));
+        final UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_ENDED,
+                mvv, null, null, cursor);
+
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+
+        // Process the event
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.processUnistrokeEvent(event);
+                appNotify();
+            }
+        });
+        unitTestWait();
+
+        // A selector should have popped up
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+
+        // Try to click one of the options
+        click(app, 275, 250);
+
+        // Clicks the create method (which should increase lifeline count and pop-up disappears)
+        click(app, 140, 120);
+
+        waitNextRenderLoop(app);
+
+        assertEquals(previousChildCount, topLayer.getChildCount());
+        assertEquals(previousLifelineCount + 1, messageView.getSpecification().getLifelines().size());
+
+        // Get newly added lifeline
+        Lifeline newLifeline = owner.getLifelines().get(previousLifelineCount);
+        EMap<EObject, LayoutElement> myMap = aspect.getLayout().getContainers().get(messageView);
+        LayoutElement lifelineLayout = myMap.get(newLifeline);
+
+        assertEquals(previousLifelineCount + 1, owner.getLifelines().size());
         assertEquals(previousMessageCount + 1, owner.getMessages().size());
     }
 
