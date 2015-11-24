@@ -1,5 +1,11 @@
 package ca.mcgill.sel.ram.ui.views.message.handler.impl;
 
+/**
+ * Integration test(Top-bottom) from MessageHandler to MessageViewController
+ * Yang Zhou
+ * ID: 260401719
+ */
+
 import static org.junit.Assert.*;
 
 import java.awt.event.MouseEvent;
