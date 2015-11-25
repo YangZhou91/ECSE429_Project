@@ -49,7 +49,7 @@ public class MessageViewControllerTest {
     private static MessageViewController controller;
     
     private Aspect aspect;
-    private String aspectLocation = "../ca.mcgill.sel.ram.gui/models/ecse429_test_models/TestModel01.ram";
+    private String aspectLocation = "../ca.mcgill.sel.ram.gui/tests/group02/ecse429_test_models/TestModel01.ram";
     
     /**
      * Sets up various classes.

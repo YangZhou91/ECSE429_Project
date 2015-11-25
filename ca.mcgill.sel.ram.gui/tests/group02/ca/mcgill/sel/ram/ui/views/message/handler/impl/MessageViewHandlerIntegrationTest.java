@@ -58,7 +58,7 @@ public class MessageViewHandlerIntegrationTest {
     private static MessageViewHandler handler;
 
     private Aspect aspect;
-    private String aspectLocation = "../ca.mcgill.sel.ram.gui/models/ecse429_test_models/TestModel01.ram";
+    private String aspectLocation = "tests/group02/ecse429_test_models/TestModel01.ram";
 
     /**
      * Set up the resources and GUI.

@@ -51,7 +51,7 @@ public class MessageViewHandlerTest {
     private static MessageViewHandler handler;
     
     private static Aspect aspect;
-    private String aspectLocation = "models/ecse429_test_models/TestModel03.ram";
+    private String aspectLocation = "tests/group02/ecse429_test_models/TestModel03.ram";
     
     /**
      * Set up the resources and GUI.

@@ -53,7 +53,7 @@ public class MessageHandlerTest {
     private static ITapAndHoldListener handler;
     
     private static Aspect aspect;
-    private String aspectLocation = "models/ecse429_test_models/TestModel02.ram";
+    private String aspectLocation = "tests/group02/ecse429_test_models/TestModel02.ram";
     
     /**
      * Set up the Resources and GUI. 
