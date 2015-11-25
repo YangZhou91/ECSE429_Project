@@ -161,6 +161,7 @@ public class MessageViewHandlerIntegrationTest {
         final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething3);
         final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
 
+        // stub
         Interaction owner = messageView.getSpecification();
         Lifeline lifelineFrom = owner.getLifelines().get(0);
         Lifeline lifelineTo = lifelineFrom;
@@ -348,22 +349,17 @@ public class MessageViewHandlerIntegrationTest {
     public void test03() throws InterruptedException {
         RamApp app = RamApp.getApplication();
         Classifier classA = aspect.getStructuralView().getClasses().get(0);
-        Operation doSomething1 = classA.getOperations().get(0);
         Operation doSomething6 = classA.getOperations().get(5);
 
         final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething6);
         Interaction owner = messageView.getSpecification();
 
         Classifier classC = aspect.getStructuralView().getClasses().get(2);
-        Operation getRandom = classC.getOperations().get(1);
         Reference classCType = RamFactory.eINSTANCE.createReference();
         classCType.setType(classC);
 
-        Lifeline lifelineFrom = owner.getLifelines().get(0);
-
         CombinedFragment cf = (CombinedFragment) owner.getFragments().get(1);
         FragmentContainer container = cf.getOperands().get(0);
-        int previousFragIndex = container.getFragments().size() - 1;
 
         int previousLifelineCount = owner.getLifelines().size();
         int previousMessageCount = owner.getMessages().size();
