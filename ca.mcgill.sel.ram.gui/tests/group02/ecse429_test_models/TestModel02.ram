@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ram:Aspect xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ram="http://cs.mcgill.ca/sel/ram/3.0" xmi:id="_UiBM8JC_EeWO-uXkUwdXZA" name="TestModel02">
+  <coreConcern href="Ecse429_test_models.core#_5DZdMIvzEeWiz_K4Hp_mDw"/>
+  <structuralView xmi:id="_UiBM8ZC_EeWO-uXkUwdXZA">
+    <classes xsi:type="ram:Class" xmi:id="_UiBM8pC_EeWO-uXkUwdXZA" name="ClassA" visibility="public">
+      <operations xmi:id="_UiBM85C_EeWO-uXkUwdXZA" name="doSomething1" visibility="public" returnType="_UiBM9pC_EeWO-uXkUwdXZA"/>
+    </classes>
+    <classes xsi:type="ram:Class" xmi:id="_UiBM9JC_EeWO-uXkUwdXZA" name="ClassB" visibility="public">
+      <operations xmi:id="_UiBM9ZC_EeWO-uXkUwdXZA" name="voidMsg" visibility="public" returnType="_UiBM9pC_EeWO-uXkUwdXZA" static="true"/>
+    </classes>
+    <types xsi:type="ram:RVoid" xmi:id="_UiBM9pC_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RAny" xmi:id="_UiBM95C_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RBoolean" xmi:id="_UiBM-JC_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RInt" xmi:id="_UiBM-ZC_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RChar" xmi:id="_UiBM-pC_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RString" xmi:id="_UiBM-5C_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RDouble" xmi:id="_UiBM_JC_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RFloat" xmi:id="_UiBM_ZC_EeWO-uXkUwdXZA"/>
+    <types xsi:type="ram:RLong" xmi:id="_UiBM_pC_EeWO-uXkUwdXZA"/>
+  </structuralView>
+  <messageViews xsi:type="ram:MessageView" xmi:id="_UiBM_5C_EeWO-uXkUwdXZA" specifies="_UiBM85C_EeWO-uXkUwdXZA">
+    <specification xmi:id="_UiBNAJC_EeWO-uXkUwdXZA">
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_UiBNAZC_EeWO-uXkUwdXZA" covered="_UiBNBZC_EeWO-uXkUwdXZA" message="_UiBNB5C_EeWO-uXkUwdXZA"/>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_UiBNApC_EeWO-uXkUwdXZA" covered="_UiBNBZC_EeWO-uXkUwdXZA" message="_UiBNCZC_EeWO-uXkUwdXZA"/>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_UiBNA5C_EeWO-uXkUwdXZA" covered="_UiBNBpC_EeWO-uXkUwdXZA" message="_UiBNCZC_EeWO-uXkUwdXZA"/>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_UiBNBJC_EeWO-uXkUwdXZA" covered="_UiBNBZC_EeWO-uXkUwdXZA" message="_UiBNCJC_EeWO-uXkUwdXZA"/>
+      <lifelines xmi:id="_UiBNBZC_EeWO-uXkUwdXZA" represents="_UiBNCpC_EeWO-uXkUwdXZA" coveredBy="_UiBNAZC_EeWO-uXkUwdXZA _UiBNBJC_EeWO-uXkUwdXZA _UiBNApC_EeWO-uXkUwdXZA"/>
+      <lifelines xmi:id="_UiBNBpC_EeWO-uXkUwdXZA" represents="_UiBNC5C_EeWO-uXkUwdXZA" coveredBy="_UiBNA5C_EeWO-uXkUwdXZA"/>
+      <messages xmi:id="_UiBNB5C_EeWO-uXkUwdXZA" sendEvent="_UiBNDJC_EeWO-uXkUwdXZA" receiveEvent="_UiBNAZC_EeWO-uXkUwdXZA" signature="_UiBM85C_EeWO-uXkUwdXZA"/>
+      <messages xmi:id="_UiBNCJC_EeWO-uXkUwdXZA" sendEvent="_UiBNBJC_EeWO-uXkUwdXZA" receiveEvent="_UiBNDZC_EeWO-uXkUwdXZA" signature="_UiBM85C_EeWO-uXkUwdXZA" messageSort="reply"/>
+      <messages xmi:id="_UiBNCZC_EeWO-uXkUwdXZA" sendEvent="_UiBNApC_EeWO-uXkUwdXZA" receiveEvent="_UiBNA5C_EeWO-uXkUwdXZA" signature="_UiBM9ZC_EeWO-uXkUwdXZA"/>
+      <properties xmi:id="_UiBNCpC_EeWO-uXkUwdXZA" name="target" lowerBound="1" type="_UiBM8pC_EeWO-uXkUwdXZA"/>
+      <properties xmi:id="_UiBNC5C_EeWO-uXkUwdXZA" static="true" lowerBound="1" type="_UiBM9JC_EeWO-uXkUwdXZA"/>
+      <formalGates xmi:id="_UiBNDJC_EeWO-uXkUwdXZA" message="_UiBNB5C_EeWO-uXkUwdXZA" name="in_doSomething1"/>
+      <formalGates xmi:id="_UiBNDZC_EeWO-uXkUwdXZA" message="_UiBNCJC_EeWO-uXkUwdXZA" name="out_doSomething1"/>
+    </specification>
+  </messageViews>
+  <layout xmi:id="_UiBNDpC_EeWO-uXkUwdXZA">
+    <containers xmi:id="_UiBND5C_EeWO-uXkUwdXZA" key="_UiBM8ZC_EeWO-uXkUwdXZA">
+      <value xmi:id="_UiBNEJC_EeWO-uXkUwdXZA" key="_UiBM8pC_EeWO-uXkUwdXZA">
+        <value xmi:id="_UiBNEZC_EeWO-uXkUwdXZA" x="109.00009" y="204.99997"/>
+      </value>
+      <value xmi:id="_UiBNEpC_EeWO-uXkUwdXZA" key="_UiBM9JC_EeWO-uXkUwdXZA">
+        <value xmi:id="_UiBNE5C_EeWO-uXkUwdXZA" x="435.99994" y="202.99992"/>
+      </value>
+    </containers>
+    <containers xmi:id="_UiBNFJC_EeWO-uXkUwdXZA" key="_UiBM_5C_EeWO-uXkUwdXZA">
+      <value xmi:id="_UiBNFZC_EeWO-uXkUwdXZA" key="_UiBNBZC_EeWO-uXkUwdXZA">
+        <value xmi:id="_UiBNFpC_EeWO-uXkUwdXZA" x="100.0" y="100.0"/>
+      </value>
+      <value xmi:id="_UiBNF5C_EeWO-uXkUwdXZA" key="_UiBNBpC_EeWO-uXkUwdXZA">
+        <value xmi:id="_UiBNGJC_EeWO-uXkUwdXZA" x="348.0" y="68.0"/>
+      </value>
+    </containers>
+  </layout>
+</ram:Aspect>

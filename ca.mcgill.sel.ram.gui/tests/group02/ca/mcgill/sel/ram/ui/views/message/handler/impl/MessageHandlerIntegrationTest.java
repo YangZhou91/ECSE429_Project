@@ -51,7 +51,7 @@ public class MessageHandlerIntegrationTest {
     private static ITapAndHoldListener handler;
 
     private static Aspect aspect;
-    private String aspectLocation = "models/ecse429_test_models/TestModel01.ram";
+    private String aspectLocation = "tests/group02/ecse429_test_models/TestModel01.ram";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {

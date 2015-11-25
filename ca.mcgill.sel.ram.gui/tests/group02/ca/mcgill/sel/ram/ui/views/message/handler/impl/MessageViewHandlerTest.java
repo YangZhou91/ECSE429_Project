@@ -51,7 +51,7 @@ public class MessageViewHandlerTest {
     private static MessageViewHandler handler;
     
     private static Aspect aspect;
-    private String aspectLocation = "models/ecse429_test_models/TestModel03.ram";
+    private String aspectLocation = "tests/group02/ecse429_test_models/TestModel03.ram";
     
     /**
      * Set up the resources and GUI.
@@ -281,6 +281,7 @@ public class MessageViewHandlerTest {
         final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething1);        
         final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
         int previousLifelineCount = messageView.getSpecification().getLifelines().size();
+        int previousMessageCount = messageView.getSpecification().getMessages().size();
         
         // Changes the scene
         app.invokeLater(new Runnable() {
@@ -325,6 +326,7 @@ public class MessageViewHandlerTest {
 
         assertEquals(previousChildCount, topLayer.getChildCount());
         assertEquals(previousLifelineCount + 1, messageView.getSpecification().getLifelines().size());
+        assertEquals(previousMessageCount + 1, messageView.getSpecification().getMessages().size());
     }
 
     /**
@@ -396,7 +398,6 @@ public class MessageViewHandlerTest {
         Operation doSomething4 = classA.getOperations().get(3);
         final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething4);        
         final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
-        int previousMessageCount = messageView.getSpecification().getMessages().size();
         
         // Changes the scene
         app.invokeLater(new Runnable() {
@@ -431,13 +432,12 @@ public class MessageViewHandlerTest {
         // A selector should have popped up
         assertEquals(previousChildCount + 1, topLayer.getChildCount());
         
-        // Try to click one of the options (click on the destroy method)
-        click(app, 480, 210);        
+        // Click the close button
+        click(app, 540, 145);        
         waitNextRenderLoop(app);
 
-        // Pop up have disappeared, and message should have increased by 1
+        // Pop up have disappeared
         assertEquals(previousChildCount, topLayer.getChildCount());
-        assertEquals(previousMessageCount + 1, messageView.getSpecification().getMessages().size());
     }
     
     /**
@@ -630,7 +630,7 @@ public class MessageViewHandlerTest {
         // A pop-up should appear
         assertEquals(previousChildCount + 1, topLayer.getChildCount());
         
-        // Now try to click create combined fragment
+        // Now try to click create assignment
         click(app, 400, 200);
         waitNextRenderLoop(app);
         
@@ -840,16 +840,8 @@ public class MessageViewHandlerTest {
         Operation doSomething5 = classA.getOperations().get(4);
         final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething5);
         Interaction owner = messageView.getSpecification();
-        System.out.println(owner.getFragments());
         CombinedFragment cf = (CombinedFragment) owner.getFragments().get(3);
         final FragmentContainer container = cf.getOperands().get(0);
-        System.out.println(container.getFragments());
-        System.out.println(container.getFragments().get(6));
-        CombinedFragment innerCf = (CombinedFragment) container.getFragments().get(6);
-        final FragmentContainer innerContainer = innerCf.getOperands().get(0);
-        System.out.println(innerContainer.getFragments().size());
-        int previousMessageCount = owner.getMessages().size();
-        int previousFragmentCount = container.getFragments().size();
         final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
         
         // Changes the scene
@@ -880,12 +872,80 @@ public class MessageViewHandlerTest {
         // A pop-up should appear
         assertEquals(previousChildCount + 1, topLayer.getChildCount());
         
-        // Now try to click create combined fragments
-        click(app, 160, 630);
+        // Click the close button
+        click(app, 265, 525);
         waitNextRenderLoop(app);
                 
         // Pop should disappear and fragment count increased by 1
         assertEquals(previousChildCount, topLayer.getChildCount());
-        assertEquals(previousFragmentCount + 1, container.getFragments().size());
+    }
+    
+    /**
+     * Extra test 2: Create message with lifeline, with various clicks. <br>
+     * @throws InterruptedException if interrupted
+     * @see #testProcessUnistrokeEvent01()
+     */
+    @Test
+    public void testProcessUnistrokeEvent08() throws InterruptedException {
+        RamApp app = RamApp.getApplication();
+        Classifier classA = aspect.getStructuralView().getClasses().get(0);
+        Operation doSomething1 = classA.getOperations().get(0);
+        final MessageView messageView = RAMModelUtil.getMessageViewFor(aspect, doSomething1);        
+        final DisplayAspectScene aspectScene = (DisplayAspectScene) app.getCurrentScene();
+        
+        // Changes the scene
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                aspectScene.showMessageView(messageView);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        MessageViewView mvv = (MessageViewView) aspectScene.getCurrentView();
+        InputCursor cursor = new InputCursor();
+        cursor.getEvents().add(new MTFingerInputEvt(null, 160, 180, 0, cursor));        
+        cursor.getEvents().add(new MTFingerInputEvt(null, 260, 180, 0, cursor));        
+        final UnistrokeEvent event = new UnistrokeEvent(null, MTGestureEvent.GESTURE_ENDED, 
+                mvv, null, null, cursor);
+        
+        MTComponent topLayer = RamApp.getActiveAspectScene().getContainerLayer().getParent();
+        int previousChildCount = topLayer.getChildCount();
+        
+        // Process the event
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.processUnistrokeEvent(event);
+                appNotify();
+            }
+        });
+        unitTestWait();
+
+        // A selector should have popped up
+        assertEquals(previousChildCount + 1, topLayer.getChildCount());
+        
+        // click the close button
+        click(app, 350, 110);
+        
+        // Process the event again
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                handler.processUnistrokeEvent(event);
+                appNotify();
+            }
+        });
+        unitTestWait();
+        
+        // Try to click one of the options
+        click(app, 275, 250);
+
+        // Close the pop up
+        click(app, 215, 55);        
+        waitNextRenderLoop(app);
+
+        assertEquals(previousChildCount, topLayer.getChildCount());
     }
 }

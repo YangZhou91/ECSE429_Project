@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ASCII"?>
+<core:COREConcern xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http://cs.mcgill.ca/sel/core/2.0" xmlns:ram="http://cs.mcgill.ca/sel/ram/3.0" xmi:id="_5DZdMIvzEeWiz_K4Hp_mDw" name="Ecse429_test_models">
+  <models xsi:type="core:COREFeatureModel" href="#_5DZdMYvzEeWiz_K4Hp_mDw"/>
+  <models xsi:type="ram:Aspect" href="TestModel01.ram#__vrH8IvzEeWiz_K4Hp_mDw"/>
+  <models xsi:type="ram:Aspect" href="TestModel02.ram#_UiBM8JC_EeWO-uXkUwdXZA"/>
+  <models xsi:type="ram:Aspect" href="TestModel03.ram#_D7hQgJGKEeWH0LW9kP-lJA"/>
+  <featureModel xmi:id="_5DZdMYvzEeWiz_K4Hp_mDw" coreConcern="_5DZdMIvzEeWiz_K4Hp_mDw" root="_5DZdMovzEeWiz_K4Hp_mDw">
+    <features xmi:id="_5DZdMovzEeWiz_K4Hp_mDw" name="Ecse429_test_models"/>
+  </featureModel>
+</core:COREConcern>
